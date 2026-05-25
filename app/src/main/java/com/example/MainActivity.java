@@ -2,7 +2,10 @@ package com.example;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.AppOpsManager;
 import android.app.admin.DevicePolicyManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -65,6 +68,16 @@ public class MainActivity extends AppCompatActivity {
     private DevicePolicyManager devicePolicyManager;
     private ComponentName adminComponent;
 
+    // Segmented Navigation & Screen Time elements
+    private com.google.android.material.tabs.TabLayout tabLayoutSegments;
+    private View containerTabShield;
+    private View containerTabStats;
+    private View containerTabSwitches;
+    private View containerTabSecurity;
+    private View cardUsagePermissionWarn;
+    private Button btnGrantUsageStats;
+    private TextView txtTotalScreenTime;
+
     // Temporary trackers to prevent toggle-loops when prompting password check
     private boolean isRevertingToggle = false;
 
@@ -111,6 +124,17 @@ public class MainActivity extends AppCompatActivity {
         switchBlockYoutube = findViewById(R.id.switch_block_youtube);
         switchBlockInstagram = findViewById(R.id.switch_block_instagram);
         switchBlockFacebook = findViewById(R.id.switch_block_facebook);
+
+        // Initialize segmented navigation tab references
+        tabLayoutSegments = findViewById(R.id.tab_layout_segments);
+        containerTabShield = findViewById(R.id.container_tab_shield);
+        containerTabStats = findViewById(R.id.container_tab_stats);
+        containerTabSwitches = findViewById(R.id.container_tab_switches);
+        containerTabSecurity = findViewById(R.id.container_tab_security);
+
+        cardUsagePermissionWarn = findViewById(R.id.card_usage_permission_warn);
+        btnGrantUsageStats = findViewById(R.id.btn_grant_usage_stats);
+        txtTotalScreenTime = findViewById(R.id.txt_total_screen_time);
 
         // Load active configurations
         switchGlobalBlocker.setChecked(statsManager.isGlobalBlockerEnabled());
@@ -261,6 +285,53 @@ public class MainActivity extends AppCompatActivity {
                 statsManager.setBlockFacebookEnabled(isChecked);
             }
         });
+
+        // Dynamic TabLayout Segment Selection Listener
+        if (tabLayoutSegments != null) {
+            tabLayoutSegments.addOnTabSelectedListener(new com.google.android.material.tabs.TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(com.google.android.material.tabs.TabLayout.Tab tab) {
+                    int position = tab.getPosition();
+                    if (containerTabShield != null) {
+                        containerTabShield.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+                    }
+                    if (containerTabStats != null) {
+                        containerTabStats.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+                    }
+                    if (containerTabSwitches != null) {
+                        containerTabSwitches.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+                    }
+                    if (containerTabSecurity != null) {
+                        containerTabSecurity.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
+                    }
+                    if (position == 1) {
+                        updateStats();
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(com.google.android.material.tabs.TabLayout.Tab tab) {}
+
+                @Override
+                public void onTabReselected(com.google.android.material.tabs.TabLayout.Tab tab) {}
+            });
+        }
+
+        // Action listener to prompt Usage Statistics permission Settings activity
+        if (btnGrantUsageStats != null) {
+            btnGrantUsageStats.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                        startActivity(intent);
+                        Toast.makeText(MainActivity.this, "Engage Screen usage permissions to unlock Focus analytics.", Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "Usage Access panel not found. Please activate in system Settings.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     private void updateSecurityViews() {
@@ -293,6 +364,46 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private boolean hasUsageStatsPermission() {
+        try {
+            AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, 
+                    android.os.Process.myUid(), getPackageName());
+            return mode == AppOpsManager.MODE_ALLOWED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private long getAppUsageMinutes(String packageName) {
+        long totalTimeMs = 0;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                UsageStatsManager usm = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
+                if (usm != null) {
+                    long endTime = System.currentTimeMillis();
+                    java.util.Calendar calendar = java.util.Calendar.getInstance();
+                    calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(java.util.Calendar.MINUTE, 0);
+                    calendar.set(java.util.Calendar.SECOND, 0);
+                    calendar.set(java.util.Calendar.MILLISECOND, 0);
+                    long startTime = calendar.getTimeInMillis();
+
+                    java.util.Map<String, UsageStats> stats = usm.queryAndAggregateUsageStats(startTime, endTime);
+                    if (stats != null && stats.containsKey(packageName)) {
+                        UsageStats usageStats = stats.get(packageName);
+                        if (usageStats != null) {
+                            totalTimeMs = usageStats.getTotalTimeInForeground();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return totalTimeMs / (1000 * 60); // convert Ms to Minute
+    }
+
     private void updateStats() {
         int blockedToday = statsManager.getBlockedCountToday();
         txtStatBlocked.setText(String.valueOf(blockedToday));
@@ -301,15 +412,45 @@ public class MainActivity extends AppCompatActivity {
         String mostDistracted = statsManager.getMostDistractingApp();
         txtMostDistracting.setText(mostDistracted);
 
+        // Verify/Warn about Usage Stats permission
+        boolean usageGranted = hasUsageStatsPermission();
+        if (cardUsagePermissionWarn != null) {
+            cardUsagePermissionWarn.setVisibility(usageGranted ? View.GONE : View.VISIBLE);
+        }
+
+        // Live screen times
+        long ytMinutes = getAppUsageMinutes("com.google.android.youtube");
+        long igMinutes = getAppUsageMinutes("com.instagram.android");
+        long ttMinutes = getAppUsageMinutes("com.zhiliaoapp.musically");
+        long fbMinutes = getAppUsageMinutes("com.facebook.katana");
+
+        long totalSocialMinutes = ytMinutes + igMinutes + ttMinutes + fbMinutes;
+
+        if (txtTotalScreenTime != null) {
+            if (usageGranted) {
+                if (totalSocialMinutes >= 60) {
+                    long hr = totalSocialMinutes / 60;
+                    long min = totalSocialMinutes % 60;
+                    txtTotalScreenTime.setText(hr + " hr " + min + " min spent today");
+                } else {
+                    txtTotalScreenTime.setText(totalSocialMinutes + " minutes spent today");
+                }
+                txtTotalScreenTime.setTextColor(getResources().getColor(R.color.accent_blue));
+            } else {
+                txtTotalScreenTime.setText("Screen Monitor Offline (Tap 'Grant' above)");
+                txtTotalScreenTime.setTextColor(getResources().getColor(R.color.text_secondary));
+            }
+        }
+
         int ytCount = statsManager.getYoutubeBlockedCount();
         int igCount = statsManager.getInstagramBlockedCount();
         int ttCount = statsManager.getTiktokBlockedCount();
         int fbCount = statsManager.getFacebookBlockedCount();
 
-        txtCountYoutube.setText(ytCount + " blocks");
-        txtCountInstagram.setText(igCount + " blocks");
-        txtCountTiktok.setText(ttCount + " blocks");
-        txtCountFacebook.setText(fbCount + " blocks");
+        txtCountYoutube.setText(ytMinutes + "m spent • " + ytCount + " blocks");
+        txtCountInstagram.setText(igMinutes + "m spent • " + igCount + " blocks");
+        txtCountTiktok.setText(ttMinutes + "m spent • " + ttCount + " blocks");
+        txtCountFacebook.setText(fbMinutes + "m spent • " + fbCount + " blocks");
 
         // Scale max dynamically based on largest count or minimum 5 to maintain fine visibility proportions
         int maxVal = Math.max(5, Math.max(ytCount, Math.max(igCount, Math.max(ttCount, fbCount))));

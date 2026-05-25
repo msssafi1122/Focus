@@ -58,6 +58,49 @@
                 android:background="@drawable/bg_circle_icon" />
         </RelativeLayout>
 
+        <!-- Dynamic Segment Navigation Tab Layout -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_segments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/accent_red"
+            app:tabTextColor="@color/text_secondary"
+            app:tabSelectedTextColor="@color/white"
+            app:tabBackground="@color/black"
+            app:tabIndicatorHeight="3dp">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shield" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stats" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Switches" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Security" />
+        </com.google.android.material.tabs.TabLayout>
+
+        <!-- Segment 1: Shield Configuration Active Screen -->
+        <LinearLayout
+            android:id="@+id/container_tab_shield"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="visible">
+
         <!-- Status Card with Pulse Shadow -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/status_card"
@@ -119,6 +162,174 @@
                     android:layout_height="48dp"
                     android:text="Enable Accessibility Shield"
                     style="@style/FocusButton" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pomodoro Card (Moved to Shield Tab) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            style="@style/FocusCardView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:id="@+id/timer_icon"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="⏱"
+                        android:textSize="18sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_square_icon"
+                        android:backgroundTint="@color/accent_green_glow"
+                        android:layout_alignParentStart="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pomodoro Study Timer"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_toEndOf="@id/timer_icon"
+                        android:layout_marginStart="12dp"
+                        android:layout_alignTop="@id/timer_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lock shorts/reels during sessions"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:layout_toEndOf="@id/timer_icon"
+                        android:layout_marginStart="12dp"
+                        android:layout_below="@+id/timer_icon"
+                        android:layout_marginTop="-16dp" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/btn_launch_timer"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Open Focus Timer"
+                    android:backgroundTint="@color/accent_green"
+                    style="@style/FocusButton" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Segment 2: Statistics & Live Screen Diagnostics -->
+        <LinearLayout
+            android:id="@+id/container_tab_stats"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+        <!-- Usage Access Perm Warning Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_usage_permission_warn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/FocusCardView"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚠️ SCREEN TIME MONITOR OFFLINE"
+                    android:textColor="@color/accent_orange"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Give FocusVault Screen Usage permission to monitor real-time distraction hours for accurate analytical profiling."
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btn_grant_usage_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="Grant Usage Permission"
+                    android:backgroundTint="@color/accent_orange"
+                    style="@style/FocusButton" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Total Screen Time Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_total_screen_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            style="@style/FocusCardView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/icon_screen_time_card"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:text="📱"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_square_icon"
+                    android:backgroundTint="#400A84FF" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today's Social Screen Time"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txt_total_screen_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 minutes"
+                        android:textColor="@color/accent_blue"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -432,67 +643,15 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Pomodoro Card -->
-        <com.google.android.material.card.MaterialCardView
+        </LinearLayout>
+
+        <!-- Segment 3: App Blocking Switchboard Controls -->
+        <LinearLayout
+            android:id="@+id/container_tab_switches"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            style="@style/FocusCardView">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="18dp">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp">
-
-                    <TextView
-                        android:id="@+id/timer_icon"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:text="⏱"
-                        android:textSize="18sp"
-                        android:gravity="center"
-                        android:background="@drawable/bg_square_icon"
-                        android:backgroundTint="@color/accent_green_glow"
-                        android:layout_alignParentStart="true" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pomodoro Study Timer"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_toEndOf="@id/timer_icon"
-                        android:layout_marginStart="12dp"
-                        android:layout_alignTop="@id/timer_icon" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Lock shorts/reels during sessions"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"
-                        android:layout_toEndOf="@id/timer_icon"
-                        android:layout_marginStart="12dp"
-                        android:layout_below="@+id/timer_icon"
-                        android:layout_marginTop="-16dp" />
-                </RelativeLayout>
-
-                <Button
-                    android:id="@+id/btn_launch_timer"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="Open Focus Timer"
-                    android:backgroundTint="@color/accent_green"
-                    style="@style/FocusButton" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            android:orientation="vertical"
+            android:visibility="gone">
 
         <!-- Controls / App Blocker List -->
         <TextView
@@ -703,6 +862,16 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        </LinearLayout>
+
+        <!-- Segment 4: Security Lockdowns & Administration Safeguards -->
+        <LinearLayout
+            android:id="@+id/container_tab_security"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
         <!-- Anti-Uninstall Security -->
         <TextView
             android:layout_width="wrap_content"
@@ -775,6 +944,8 @@
                     style="@style/FocusButton.Secondary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

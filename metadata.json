@@ -1,0 +1,6 @@
+{
+  "name": "FocusVault",
+  "description": "Addiction Destroyer - Blocks YouTube Shorts, Instagram Reels, Facebook Reels, and TikTok using Accessibility Services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

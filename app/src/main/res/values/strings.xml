@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FocusVault</string>
+    <string name="title_addiction_destroyer">Addiction Destroyer</string>
+    <string name="desc_app_blocker">Block addictive short-form content dynamically.</string>
+    <string name="status_shield_active">Focus Shield Active</string>
+    <string name="status_shield_inactive">Shield Offline</string>
+    <string name="enable_blocker_switch">Toggle Block Shield</string>
+    <string name="strict_mode_switch">Strict Protection</string>
+    <string name="reels_blocked_today">Reels Blocked Today</string>
+    <string name="time_saved_today">Time Saved (Min)</string>
+    <string name="most_distracting_app">Most Intercepted</string>
+    <string name="start_focus">Start Study Session</string>
+    <string name="pause_timer">Pause</string>
+    <string name="resume_timer">Resume</string>
+    <string name="stop_focus">Stop Session</string>
+    <string name="overlay_warning_title">&#x26A0; Focus Mode Active</string>
+    <string name="overlay_warning_msg">Get back to studying! YouTube Shorts, Instagram Reels, Facebook Reels, and TikTok are blocked during focus mode.</string>
+    <string name="button_back_to_study">Back to Study</string>
+    <string name="bubble_duration_indicator">Active Focus</string>
+    <string name="pin_setup_title">Enter Lock PIN</string>
+    <string name="pin_desc_strict">Passcode required to disable focus shield in Strict Mode</string>
+    <string name="pin_btn_clear">C</string>
+    <string name="pin_btn_submit">OK</string>
+</resources>
